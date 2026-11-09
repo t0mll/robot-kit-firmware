@@ -2,6 +2,7 @@
 // LilyGO T-Display-S3 (the Brain). Display and on-board buttons are fixed by the board;
 // the 3rd button, buzzer and battery sense are wired by the Builder (defaults below, per Robot sketch overridable).
 // Never reconfigure GPIO19/20: they're the native USB pins, and browser re-flashing breaks.
+// Free for Robots: 1, 2, 3, 10, 11, 12, 13, 16, 21, 43, 44 (43/44 are UART0, unused: serial runs over USB).
 
 namespace pins {
 constexpr int LCD_POWER = 15;   // must be driven HIGH, or the backlight stays off on battery
@@ -11,12 +12,14 @@ constexpr int LCD_WR = 8, LCD_RD = 9, LCD_DC = 7, LCD_CS = 6, LCD_RST = 5;
 
 constexpr int BUTTON_PREV = 0;    // on-board BOOT button
 constexpr int BUTTON_NEXT = 14;   // on-board KEY button
+constexpr int I2C_SDA = 18;       // the Brain's Qwiic connector
+constexpr int I2C_SCL = 17;
 }  // namespace pins
 
 /// Pins the Builder wires; each Robot sketch passes its own in Shell::Config.
 struct ShellPins {
   int buttonSelect = 16;   // the 3rd button
-  int buzzer = 17;         // passive buzzer
+  int buzzer = 21;         // passive buzzer
   int batterySense = -1;   // ADC pin behind a divider, or -1 when not wired
   float batteryDivider = 2.0f;  // volts at the pin × this = battery volts (100k/100k → 2.0)
 };

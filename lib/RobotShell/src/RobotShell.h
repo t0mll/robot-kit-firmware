@@ -31,6 +31,8 @@ class RobotShellClass {
   /// Battery voltage, or 0 when no battery-sense pin is wired.
   float batteryVolts();
   const char* robotName() const { return config_.robotName; }
+  /// The running Mode's name, or "menu" / "face".
+  const char* modeName() const;
   const char* version() const { return FW_VERSION; }
 
   Face face;

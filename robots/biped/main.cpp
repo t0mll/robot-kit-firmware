@@ -28,7 +28,7 @@ void setup() {
   RobotShellClass::Config config;
   config.robotName = "Biped";
   config.pins.buttonSelect = 16;
-  config.pins.buzzer = 17;
+  config.pins.buzzer = 21;
   config.pins.batterySense = 2;  // battery-sense line on the Power Pack's 3-pin plug
   config.pins.batteryDivider = 4.0f;  // 2S pack: up to 8.4 V into a 3.3 V ADC
 

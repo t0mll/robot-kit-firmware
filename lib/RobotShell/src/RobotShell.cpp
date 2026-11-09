@@ -49,6 +49,11 @@ void RobotShellClass::addMode(Mode& mode) {
   if (modeCount_ < MAX_MODES) modes_[modeCount_++] = &mode;
 }
 
+const char* RobotShellClass::modeName() const {
+  if (screen_ == Screen::Mode && activeMode_ >= 0) return modes_[activeMode_]->name();
+  return screen_ == Screen::Menu ? "menu" : "face";
+}
+
 float RobotShellClass::batteryVolts() {
   if (config_.pins.batterySense < 0) return 0.0f;
   return analogReadMilliVolts(config_.pins.batterySense) / 1000.0f * config_.pins.batteryDivider;

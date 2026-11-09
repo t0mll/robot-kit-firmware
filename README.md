@@ -15,7 +15,10 @@ Each Robot adds its own **Modes**.
 | `robots/biped/` | The Biped, the learning walker. |
 | `scripts/` | Version stamping and packaging for browser flashing. |
 
-**Status:** skeleton. The Face, menu, buttons, buzzer and placeholder Modes work. Motors, sensors, the phone remote, the walking policy and block coding (MicroBlocks) arrive next.
+**Status:** untested on hardware.
+- **Rover r1** has motors with ramping and a stall cut-off (on encoders), the VL53L0X, an I2C line sensor (provisional protocol), the phone remote, and the Modes Drive, Line follow, Explore (stops at table edges), Follow my hand and Wiring check.
+- **Biped** still has placeholder Modes.
+- **Still to come:** gamepad driving, the walking policy and block coding (MicroBlocks).
 
 ## Build
 
@@ -36,6 +39,10 @@ CI builds a merged binary and an [ESP Web Tools](https://esphome.github.io/esp-w
 - **Drive GPIO15 high** for the screen to light on battery (the Shell does it).
 - **No GPL dependencies**: everything here stays MIT-compatible.
 
+## Rover phone remote
+
+On first start the Rover makes its own Wi-Fi hotspot. Its name and password show on the Face in Drive mode. Join it and open `http://192.168.4.1`. To use your home Wi-Fi instead, open **Wi-Fi settings** on that page: the Rover restarts, joins it, and shows its address on the Face. Drive commands expire after 500 ms, so a dropped phone stops the Rover.
+
 ## Licence
 
-MIT, see [LICENSE](LICENSE). Third-party libraries keep their own licences: LovyanGFX (FreeBSD).
+MIT, see [LICENSE](LICENSE). Third-party libraries keep their own licences: LovyanGFX (FreeBSD), Pololu VL53L0X (MIT).
