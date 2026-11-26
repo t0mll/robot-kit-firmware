@@ -31,6 +31,8 @@ void setup() {
   config.pins.buzzer = 21;
   config.pins.batterySense = 2;  // battery-sense line on the Power Pack's 3-pin plug
   config.pins.batteryDivider = 4.0f;  // 2S pack: up to 8.4 V into a 3.3 V ADC
+  // 2S Li-ion Power Pack: the same per-cell limits as the Rover, doubled.
+  config.battery = {/*absentBelow*/ 5.0f, /*low*/ 6.9f, /*empty*/ 6.6f, /*recover*/ 7.4f};
 
   RobotShell.addMode(drive);
   RobotShell.addMode(explore);

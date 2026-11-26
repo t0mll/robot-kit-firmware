@@ -256,6 +256,9 @@ void setup() {
   config.pins.buzzer = rover::BUZZER;
   config.pins.batterySense = rover::BATTERY_SENSE;
   config.pins.batteryDivider = 2.0f;
+  // One Li-ion 18650. Stop before the IP5306's own cut-off (~3.0 V) with margin for motor sag;
+  // charging lifts the cell past 3.7 V, which clears it.
+  config.battery = {/*absentBelow*/ 2.5f, /*low*/ 3.45f, /*empty*/ 3.30f, /*recover*/ 3.70f};
 
   RobotShell.addMode(driveMode);
   RobotShell.addMode(lineFollowMode);

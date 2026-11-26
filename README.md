@@ -4,7 +4,8 @@ Open-source (MIT) Firmware for [Robot Kit Shop](https://robotkit.shop) robots. E
 
 - the **Face**: animated eyes with 8 Expressions;
 - a **menu** of Modes on the 3 buttons (prev / select / next; long-press select to go back);
-- a buzzer, settings in NVS (they survive re-flashing), and battery level.
+- a buzzer, settings in NVS (they survive re-flashing), and battery level;
+- a **battery guard**: on a low battery it beeps and the Face gets sleepy; on an empty one it leaves any Mode that moves the Robot and won't start another until the cell is charging. Each Robot sets its thresholds in `config.battery`, and a Mode that never moves anything returns `false` from `usesActuators()`.
 
 Each Robot adds its own **Modes**.
 
@@ -27,6 +28,7 @@ Requires [PlatformIO](https://platformio.org). The Arduino-ESP32 core is pinned 
 ```bash
 pio run                 # build every Robot
 pio run -e rover -t upload
+pio test -e native      # host unit tests (the battery guard)
 ```
 
 ## Flash from the browser

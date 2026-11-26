@@ -10,4 +10,7 @@ class Mode {
   virtual void enter() {}
   virtual void loop() {}
   virtual void exit() {}
+  /// True when the Mode moves motors or servos. The Shell won't start one on an empty battery and
+  /// leaves it when the battery runs empty. Leave it true for anything that might move the Robot.
+  virtual bool usesActuators() const { return true; }
 };
