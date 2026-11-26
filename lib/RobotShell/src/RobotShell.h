@@ -1,6 +1,7 @@
 #pragma once
 #include <Arduino.h>
 #include <Preferences.h>
+#include "BatteryGuard.h"
 #include "BoardPins.h"
 #include "Display.h"
 #include "Expression.h"
@@ -20,6 +21,8 @@ class RobotShellClass {
   struct Config {
     const char* robotName = "Robot";
     ShellPins pins;
+    /// Battery thresholds for this Robot's cells; the guard is off while `battery.empty` is 0.
+    BatteryLimits battery{};
   };
 
   void begin(const Config& config);
@@ -30,6 +33,8 @@ class RobotShellClass {
 
   /// Battery voltage, or 0 when no battery-sense pin is wired.
   float batteryVolts();
+  /// Ok, Low or Empty from the battery guard; Unknown with no sense pin, no limits or no cell (USB only).
+  BatteryState batteryState() const { return battery_.state(); }
   const char* robotName() const { return config_.robotName; }
   /// The running Mode's name, or "menu" / "face".
   const char* modeName() const;
@@ -46,6 +51,7 @@ class RobotShellClass {
   void drawMenu();
   void enterMode(int index);
   void leaveMode();
+  void watchBattery(uint32_t nowMs);
 
   static constexpr int MAX_MODES = 12;
   Config config_;
@@ -56,6 +62,8 @@ class RobotShellClass {
   volatile int activeMode_ = -1;
   volatile Screen screen_ = Screen::Face;
   bool started_ = false;
+  BatteryGuard battery_;
+  uint32_t lastBatteryMs_ = 0;
 };
 
 extern RobotShellClass RobotShell;

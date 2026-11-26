@@ -28,6 +28,8 @@ jobs:
         run: |
           if [[ "$GITHUB_REF" == refs/tags/v* ]]; then v="${GITHUB_REF_NAME#v}"; else v="$(git rev-parse --short HEAD)"; fi
           echo "value=$v" >> "$GITHUB_OUTPUT"
+      - name: Unit tests (host)
+        run: pio test -e native
       - name: Build every Robot
         run: pio run
         env:

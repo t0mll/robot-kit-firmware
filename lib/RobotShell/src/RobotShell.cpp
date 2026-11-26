@@ -18,7 +18,11 @@ class AboutMode : public Mode {
     RobotShell.face.caption(line);
   }
   void exit() override { RobotShell.face.caption(""); }
+  bool usesActuators() const override { return false; }
 };
+
+constexpr uint32_t BATTERY_EVERY_MS = 100;
+constexpr const char* EMPTY_CAPTION = "Battery empty: charge me";
 AboutMode aboutMode;
 }  // namespace
 
@@ -34,7 +38,10 @@ void RobotShellClass::begin(const Config& config) {
   input.begin(pins::BUTTON_PREV, config_.pins.buttonSelect, pins::BUTTON_NEXT);
   sound.begin(config_.pins.buzzer);
   settings.begin("shell", false);
-  if (config_.pins.batterySense >= 0) analogReadResolution(12);
+  if (config_.pins.batterySense >= 0) {
+    analogReadResolution(12);
+    battery_.setLimits(config_.battery);
+  }
 
   addMode(aboutMode);
   started_ = true;
@@ -61,6 +68,13 @@ float RobotShellClass::batteryVolts() {
 
 void RobotShellClass::enterMode(int index) {
   if (index < 0 || index >= modeCount_) return;
+  if (battery_.state() == BatteryState::Empty && modes_[index]->usesActuators()) {
+    screen_ = Screen::Face;
+    face.set(Expression::Sleepy);
+    face.caption(EMPTY_CAPTION);
+    sound.tone(330, 300);
+    return;
+  }
   activeMode_ = index;
   screen_ = Screen::Mode;
   face.caption(modes_[index]->name());
@@ -77,6 +91,7 @@ void RobotShellClass::leaveMode() {
 
 void RobotShellClass::update() {
   if (!started_) return;
+  watchBattery(millis());
   const ButtonEvent ev = input.poll();
   if (ev != ButtonEvent::None) sound.chirp();
 
@@ -96,6 +111,43 @@ void RobotShellClass::update() {
       break;
   }
   sound.update();
+}
+
+/// Reads the battery every 100 ms. On empty it leaves a Mode that moves the Robot (its exit() stops the
+/// actuators) and shows a sleepy Face; on low it warns once. Charging past the recover voltage clears it.
+void RobotShellClass::watchBattery(uint32_t nowMs) {
+  if (!battery_.enabled() || nowMs - lastBatteryMs_ < BATTERY_EVERY_MS) return;
+  lastBatteryMs_ = nowMs;
+  const BatteryState before = battery_.state();
+  const BatteryState now = battery_.update(batteryVolts(), nowMs);
+  if (now == before) return;
+
+  switch (now) {
+    case BatteryState::Empty:
+      if (screen_ == Screen::Mode && activeMode_ >= 0 && modes_[activeMode_]->usesActuators()) leaveMode();
+      if (screen_ != Screen::Mode) {
+        screen_ = Screen::Face;
+        face.set(Expression::Sleepy);
+        face.caption(EMPTY_CAPTION);
+      }
+      sound.tone(330, 400);
+      break;
+    case BatteryState::Low:
+      if (before == BatteryState::Empty) break;  // charging: from empty to low, nothing to warn about
+      sound.tone(440, 150);
+      if (screen_ == Screen::Face) {
+        face.set(Expression::Sleepy);
+        face.caption("Battery low");
+      }
+      break;
+    case BatteryState::Ok:
+    case BatteryState::Unknown:
+      if (screen_ == Screen::Face && (before == BatteryState::Low || before == BatteryState::Empty)) {
+        face.set(Expression::Neutral);
+        face.caption("");
+      }
+      break;
+  }
 }
 
 void RobotShellClass::drawMenu() {
